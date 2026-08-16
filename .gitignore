@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Secrets — NEVER commit these
+.env
+
+# Notes (personal data)
+notes.txt
+
+# Editor
+.vscode/
+.idea/
+*.swp
