@@ -8,7 +8,7 @@ import logging
 import urllib.request
 import urllib.error
 
-from config import OLLAMA_BASE_URL, OLLAMA_MODEL, ASSISTANT_NAME
+from config import OLLAMA_BASE_URL, OLLAMA_MODEL, ASSISTANT_NAME, WEBSITES
 from commands import (
     get_time, get_date,
     open_website, web_search,
@@ -82,9 +82,10 @@ def process_command(text: str) -> str:
         return get_date()
 
     # ── Music ──
-    if "stop music" in text or "pause music" in text:
+    if any(kw in text for kw in ("stop music", "pause music", "stop the music", "pause the music")):
         return stop_music()
-    if "play music" in text or "play song" in text or "play some music" in text:
+    # Catch all natural play phrases: "play music", "play the song", "play a song", "play the music" etc.
+    if "play" in text and any(w in text for w in ("music", "song", "track", "audio")):
         return play_music(text)
 
     # ── Notes ──
@@ -94,9 +95,7 @@ def process_command(text: str) -> str:
         return read_notes()
 
     # ── Open website ──
-    if "open" in text and any(site in text for site in ("google", "youtube", "github",
-                                                          "stackoverflow", "wikipedia",
-                                                          "gmail", "maps", "chatgpt")):
+    if "open" in text and any(site in text for site in WEBSITES):
         return open_website(text)
 
     # ── Web search ──
