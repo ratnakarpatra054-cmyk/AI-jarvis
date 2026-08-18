@@ -50,12 +50,16 @@ def ask_ollama(prompt: str) -> str:
             data = json.loads(resp.read().decode("utf-8"))
             return data.get("response", "").strip()
     except urllib.error.URLError:
-        return (
-            "The local AI model is not running. "
-            "To enable AI chat, install Ollama from ollama dot com, "
-            f"then run: ollama pull {OLLAMA_MODEL}, and ollama serve. "
-            "All other Jarvis features are working fine."
+        # Print full instructions to console (not spoken — too long for TTS)
+        print(
+            "\n[INFO] Ollama AI model is not running.\n"
+            "       To enable AI chat:\n"
+            "         1. Install Ollama  →  https://ollama.com\n"
+            f"         2. Run: ollama pull {OLLAMA_MODEL}\n"
+            "         3. Run: ollama serve\n"
+            "       All other Jarvis features (time, web, apps, notes) work fine.\n"
         )
+        return "The AI model is not running. Check the console for setup instructions."
     except (json.JSONDecodeError, KeyError) as exc:
         logger.error("Unexpected Ollama response format: %s", exc)
         return "I received an unexpected response from the AI model."
