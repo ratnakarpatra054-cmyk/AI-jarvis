@@ -29,6 +29,7 @@ Usage
 import sys
 import io
 import json
+import logging
 import pathlib
 import tempfile
 import unittest
@@ -41,6 +42,11 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+# ── Silence noisy loggers during tests (errors are intentionally triggered) ──
+# This prevents log output like "STT network error", "Failed to launch X" etc.
+# from polluting the clean test results output.
+logging.disable(logging.CRITICAL)   # suppress all log levels below CRITICAL
 
 print("=" * 65)
 print("   AI Jarvis — Complete Automated Test Suite")
