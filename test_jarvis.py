@@ -596,12 +596,14 @@ class TestOllamaIntegration(unittest.TestCase):
             result = ask_ollama("anything")
         self.assertIn("not running", result.lower())
 
-    def test_ollama_not_running_mentions_ollama(self):
+    def test_ollama_not_running_mentions_ai_model(self):
+        """Spoken reply should mention the model is not running."""
         with patch("urllib.request.urlopen",
                    side_effect=urllib.error.URLError("connection refused")):
             from assistant import ask_ollama
             result = ask_ollama("anything")
-        self.assertIn("ollama", result.lower())
+        # Message shortened for TTS — check key phrase instead of 'ollama'
+        self.assertIn("not running", result.lower())
 
     @patch("urllib.request.urlopen")
     def test_invalid_json_response(self, mock_urlopen):
@@ -673,20 +675,21 @@ class TestProcessCommand(unittest.TestCase):
     # ── Music ─────────────────────────────────────────────────────────────────
 
     def test_play_music_routed(self):
-        with patch("commands.play_music", return_value="Playing song.") as m:
+        # Patch at assistant level — that's where play_music is imported into
+        with patch("assistant.play_music", return_value="Playing song.") as m:
             from assistant import process_command
             result = process_command("play music")
         m.assert_called_once()
         self.assertEqual(result, "Playing song.")
 
     def test_stop_music_routed(self):
-        with patch("commands.stop_music", return_value="Music stopped.") as m:
+        with patch("assistant.stop_music", return_value="Music stopped.") as m:
             from assistant import process_command
-            result = process_command("stop music")
+            process_command("stop music")
         m.assert_called_once()
 
     def test_pause_music_routed(self):
-        with patch("commands.stop_music", return_value="Music stopped.") as m:
+        with patch("assistant.stop_music", return_value="Music stopped.") as m:
             from assistant import process_command
             process_command("pause music")
         m.assert_called_once()
@@ -694,19 +697,19 @@ class TestProcessCommand(unittest.TestCase):
     # ── Notes ─────────────────────────────────────────────────────────────────
 
     def test_take_note_routed(self):
-        with patch("commands.take_note", return_value="Note saved.") as m:
+        with patch("assistant.take_note", return_value="Note saved.") as m:
             from assistant import process_command
             process_command("take a note buy eggs")
         m.assert_called_once()
 
     def test_read_notes_routed(self):
-        with patch("commands.read_notes", return_value="Note 1") as m:
+        with patch("assistant.read_notes", return_value="Note 1") as m:
             from assistant import process_command
             process_command("read notes")
         m.assert_called_once()
 
     def test_show_notes_routed(self):
-        with patch("commands.read_notes", return_value="Note 1") as m:
+        with patch("assistant.read_notes", return_value="Note 1") as m:
             from assistant import process_command
             process_command("show notes")
         m.assert_called_once()
